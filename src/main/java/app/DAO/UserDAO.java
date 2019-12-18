@@ -13,55 +13,27 @@ import java.util.List;
 
 public class UserDAO {
 
-    private String jdbcURL = "jdbc:mysql://localhost:3306/pp01";
-    private String jdbcUsername = "root";
-    private String jdbcPassword = "root";
+    private Connection connection;
 
-    private static final String INSERT_USERS_SQL = "INSERT INTO users"
-            + "  (firstName, lastName, mail) VALUES "
-            + " (?, ?, ?);";
-
-    private static final String SELECT_USER_BY_ID = "select id, firstName, lastName, mail from users where id =?";
-    private static final String SELECT_ALL_USERS = "select * from users";
-    private static final String DELETE_USERS_SQL = "delete from users where id = ?;";
-    private static final String UPDATE_USERS_SQL = "update users set firstName = ?,lastName= ?, mail =? where id = ?;";
-
-    public UserDAO() {
+    public UserDAO(Connection connection) {
+        this.connection = connection;
     }
 
-    protected Connection getConnection() {
-        Connection connection = null;
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return connection;
-    }
-
-    public void insertUser(User user) throws SQLException {
-        System.out.println(INSERT_USERS_SQL);
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USERS_SQL)) {
+    public void insertUserDAO(User user) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users (firstName, lastName, mail) VALUES (?, ?, ?);")) {
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getLastName());
             preparedStatement.setString(3, user.getMail());
-            System.out.println(preparedStatement);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public User selectUser(Long id) {
+    public User selectUserDAO(Long id) {
         User user = null;
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_USER_BY_ID);) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("select id, firstName, lastName, mail from users where id =?")) {
             preparedStatement.setLong(1, id);
-            System.out.println(preparedStatement);
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
@@ -71,17 +43,17 @@ public class UserDAO {
                 user = new User(id, firstName, lastName, mail);
             }
         } catch (SQLException e) {
-            e.printStackTrace();;
+            e.printStackTrace();
         }
         return user;
     }
 
-    public List<User> selectAllUsers() {
+    public List<User> selectAllUsersDAO() {
 
         List<User> users = new ArrayList<>();
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_USERS);) {
-            System.out.println(preparedStatement);
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement("select * from users")) {
+
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
@@ -92,43 +64,28 @@ public class UserDAO {
                 users.add(new User(id, firstName, lastName, mail));
             }
         } catch (SQLException e) {
-            e.printStackTrace();;
+            e.printStackTrace();
         }
         return users;
     }
 
-    public boolean deleteUser(Long id) throws SQLException {
-        boolean rowDeleted;
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_USERS_SQL);) {
+    public void deleteUserDAO(Long id) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("delete from users where id = ?;")) {
             statement.setLong(1, id);
-            rowDeleted = statement.executeUpdate() > 0;
+            statement.executeUpdate();
         }
-        return rowDeleted;
     }
 
-    public boolean updateUser(User user) throws SQLException {
-        boolean rowUpdated;
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_USERS_SQL);) {
+    public void updateUserDAO(User user) throws SQLException {
+
+        try (PreparedStatement statement = connection.prepareStatement("update users set firstName = ?,lastName= ?, mail =? where id = ?;")) {
 
             statement.setString(1, user.getFirstName());
             statement.setString(2, user.getLastName());
             statement.setString(3, user.getMail());
             statement.setLong(4, user.getId());
 
-            rowUpdated = statement.executeUpdate() > 0;
+            statement.executeUpdate();
         }
-        return rowUpdated;
-    }
-
-    public void showEditForm(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, ServletException, IOException {
-        Long id = Long.parseLong(request.getParameter("id"));
-        User existingUser = selectUser(id);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("views/editUser.jsp");
-        request.setAttribute("user", existingUser);
-        dispatcher.forward(request, response);
-
     }
 }

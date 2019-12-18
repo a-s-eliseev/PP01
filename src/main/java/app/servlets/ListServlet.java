@@ -1,8 +1,7 @@
 package app.servlets;
 
-import app.DAO.UserDAO;
 import app.entities.User;
-
+import app.service.UserServiceImpl;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,16 +14,9 @@ import java.util.List;
 @WebServlet("/")
 public class ListServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-    private UserDAO userDAO;
-
-    public void init() {
-        userDAO = new UserDAO();
-    }
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<User> listUser = userDAO.selectAllUsers();
+        List<User> listUser = new UserServiceImpl().listUser();
         req.setAttribute("listUser", listUser);
         RequestDispatcher dispatcher = req.getRequestDispatcher("views/listUsers.jsp");
         dispatcher.forward(req, resp);

@@ -1,8 +1,7 @@
 package app.servlets;
 
-import app.DAO.UserDAO;
 import app.entities.User;
-
+import app.service.UserServiceImpl;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,24 +13,20 @@ import java.sql.SQLException;
 
 @WebServlet("/edit")
 public class EditUserServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    private UserDAO userDAO;
-
-    public void init() {
-        userDAO = new UserDAO();
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            userDAO.showEditForm(req, resp);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+            Long id = Long.parseLong(req.getParameter("id"));
+            User existingUser = new UserServiceImpl().selectUser(id);
+            RequestDispatcher dispatcher = req.getRequestDispatcher("views/editUser.jsp");
+            req.setAttribute("user", existingUser);
+            dispatcher.forward(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
         Long id = Long.parseLong(req.getParameter("id"));
 
         String firstName = req.getParameter("firstName");
@@ -39,7 +34,7 @@ public class EditUserServlet extends HttpServlet {
         String mail = req.getParameter("mail");
         User editUser = new User(id, firstName, lastName, mail);
         try {
-            userDAO.updateUser(editUser);
+            new UserServiceImpl().editUser(editUser);
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -1,8 +1,7 @@
 package app.servlets;
 
-
-import app.DAO.UserDAO;
 import app.entities.User;
+import app.service.UserServiceImpl;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,12 +14,6 @@ import java.sql.SQLException;
 
 @WebServlet("/reg")
 public class AddUserServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    private UserDAO userDAO;
-
-    public void init() {
-        userDAO = new UserDAO();
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -29,16 +22,12 @@ public class AddUserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String firstName = req.getParameter("firstName");
         String lastName = req.getParameter("lastName");
         String mail = req.getParameter("mail");
         User newUser = new User(firstName, lastName, mail);
-        try {
-            userDAO.insertUser(newUser);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        new UserServiceImpl().newUser(newUser);
         resp.sendRedirect("/");
     }
 }
