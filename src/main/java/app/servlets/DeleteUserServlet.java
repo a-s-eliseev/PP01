@@ -11,11 +11,13 @@ import java.sql.SQLException;
 @WebServlet("/delete")
 public class DeleteUserServlet extends HttpServlet {
 
+    UserServiceImpl instance = new UserServiceImpl();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Long id = Long.parseLong(req.getParameter("id"));
         try {
-            new UserServiceImpl().deleteUser(id);
+            instance.deleteUser(id);
         } catch (SQLException e) {
             e.printStackTrace();
         }

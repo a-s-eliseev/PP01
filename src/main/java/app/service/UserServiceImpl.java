@@ -1,6 +1,6 @@
 package app.service;
 
-import app.DAO.UserDAO;
+import app.DAO.UserDaoImpl;
 import app.entities.User;
 import app.util.DBHelper;
 
@@ -9,32 +9,30 @@ import java.util.List;
 
 public class UserServiceImpl implements UserService {
 
+    UserDaoImpl userDao = new UserDaoImpl(DBHelper.getConnection());
+
     @Override
     public void newUser(User user) {
-        getUserDAO().insertUserDAO(user);
+        userDao.insertUser(user);
     }
 
     @Override
     public List<User> listUser() {
-        return getUserDAO().selectAllUsersDAO();
+        return userDao.selectAllUsers();
     }
 
     @Override
     public User selectUser(Long id) {
-        return getUserDAO().selectUserDAO(id);
+        return userDao.selectUser(id);
     }
 
     @Override
     public void editUser(User user) throws SQLException {
-        getUserDAO().updateUserDAO(user);
+        userDao.updateUser(user);
     }
 
     @Override
     public void deleteUser(Long id) throws SQLException {
-        getUserDAO().deleteUserDAO(id);
-    }
-
-    private static UserDAO getUserDAO() {
-        return new UserDAO(DBHelper.getConnection());
+        userDao.deleteUser(id);
     }
 }

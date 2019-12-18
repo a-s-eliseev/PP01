@@ -14,9 +14,11 @@ import java.util.List;
 @WebServlet("/")
 public class ListServlet extends HttpServlet {
 
+    UserServiceImpl instance = new UserServiceImpl();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<User> listUser = new UserServiceImpl().listUser();
+        List<User> listUser = instance.listUser();
         req.setAttribute("listUser", listUser);
         RequestDispatcher dispatcher = req.getRequestDispatcher("views/listUsers.jsp");
         dispatcher.forward(req, resp);

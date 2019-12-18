@@ -8,9 +8,8 @@ public class PropertyReader {
 
     public static String getProperty(String nameParam) throws IOException {
         Properties properties = new Properties();
-        File fileProperties = new File(Objects.requireNonNull(PropertyReader.class.getClassLoader().getResource("properties")).getFile());
-        //File file = new File("C:\\IdeaProjects\\PP01\\src\\main\\resources\\properties");
-        properties.load(new FileReader(fileProperties));
+        String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("config.properties")).getPath();
+        properties.load(new FileInputStream(rootPath));
         return properties.getProperty(nameParam);
     }
 }

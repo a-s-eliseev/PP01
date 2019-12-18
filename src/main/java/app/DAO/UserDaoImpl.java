@@ -2,19 +2,22 @@ package app.DAO;
 
 import app.entities.User;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAO {
+public class UserDaoImpl implements UserDao {
 
     private Connection connection;
 
-    public UserDAO(Connection connection) {
+    public UserDaoImpl(Connection connection) {
         this.connection = connection;
     }
 
-    public void insertUserDAO(User user) {
+    public void insertUser(User user) {
         try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users (firstName, lastName, mail) VALUES (?, ?, ?);")) {
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getLastName());
@@ -25,7 +28,7 @@ public class UserDAO {
         }
     }
 
-    public User selectUserDAO(Long id) {
+    public User selectUser(Long id) {
         User user = null;
         try (PreparedStatement preparedStatement = connection.prepareStatement("select id, firstName, lastName, mail from users where id =?")) {
             preparedStatement.setLong(1, id);
@@ -43,7 +46,7 @@ public class UserDAO {
         return user;
     }
 
-    public List<User> selectAllUsersDAO() {
+    public List<User> selectAllUsers() {
 
         List<User> users = new ArrayList<>();
 
@@ -64,14 +67,14 @@ public class UserDAO {
         return users;
     }
 
-    public void deleteUserDAO(Long id) throws SQLException {
+    public void deleteUser(Long id) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement("delete from users where id = ?;")) {
             statement.setLong(1, id);
             statement.executeUpdate();
         }
     }
 
-    public void updateUserDAO(User user) throws SQLException {
+    public void updateUser(User user) throws SQLException {
 
         try (PreparedStatement statement = connection.prepareStatement("update users set firstName = ?,lastName= ?, mail =? where id = ?;")) {
 

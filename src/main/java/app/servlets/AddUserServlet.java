@@ -10,10 +10,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 
 @WebServlet("/reg")
 public class AddUserServlet extends HttpServlet {
+
+    UserServiceImpl instance = new UserServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -27,7 +28,7 @@ public class AddUserServlet extends HttpServlet {
         String lastName = req.getParameter("lastName");
         String mail = req.getParameter("mail");
         User newUser = new User(firstName, lastName, mail);
-        new UserServiceImpl().newUser(newUser);
+        instance.newUser(newUser);
         resp.sendRedirect("/");
     }
 }

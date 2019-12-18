@@ -14,11 +14,13 @@ import java.sql.SQLException;
 @WebServlet("/edit")
 public class EditUserServlet extends HttpServlet {
 
+    UserServiceImpl instance = new UserServiceImpl();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             Long id = Long.parseLong(req.getParameter("id"));
-            User existingUser = new UserServiceImpl().selectUser(id);
+            User existingUser = instance.selectUser(id);
             RequestDispatcher dispatcher = req.getRequestDispatcher("views/editUser.jsp");
             req.setAttribute("user", existingUser);
             dispatcher.forward(req, resp);
@@ -34,7 +36,7 @@ public class EditUserServlet extends HttpServlet {
         String mail = req.getParameter("mail");
         User editUser = new User(id, firstName, lastName, mail);
         try {
-            new UserServiceImpl().editUser(editUser);
+            instance.editUser(editUser);
         } catch (SQLException e) {
             e.printStackTrace();
         }
